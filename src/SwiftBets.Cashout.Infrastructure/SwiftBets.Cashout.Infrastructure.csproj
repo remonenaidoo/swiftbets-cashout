@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="SwiftBets.BuildingBlocks.Core" />
+    <PackageReference Include="SwiftBets.BuildingBlocks.Resilience" />
+    <PackageReference Include="SwiftBets.BuildingBlocks.Web" />
+    <PackageReference Include="SwiftBets.Contracts.Grpc" />
+    <PackageReference Include="Grpc.Net.ClientFactory" />
+    <ProjectReference Include="../SwiftBets.Cashout.Application/SwiftBets.Cashout.Application.csproj" />
+  </ItemGroup>
+</Project>
