@@ -1,5 +1,6 @@
 using SwiftBets.BuildingBlocks.Web;
 using SwiftBets.Cashout.Application;
+using SwiftBets.Contracts.Errors;
 using SwiftBets.Contracts.Serialization;
 
 namespace SwiftBets.Cashout.Api;
@@ -29,12 +30,17 @@ public static class CashoutEndpoints
             }
 
             // A stale or moved quote comes back with a fresh one, so the customer can confirm the new amount.
-            return refused!.FreshQuote is { } fresh
-                ? Results.Json(new { error = refused.Error.Code, message = refused.Error.Message, freshQuote = fresh }, ContractJson.Options, statusCode: StatusCodes.Status409Conflict)
-                : refused.Error.ToHttpResult(context);
+            return refused!.FreshQuote is { } fresh ? Refused(context, refused.Error.Code, refused.Error.Message, fresh) : refused.Error.ToHttpResult(context);
         });
 
         return endpoints;
+    }
+
+    /// <summary>The standard error envelope (problem+json) carrying the fresh quote as an extension.</summary>
+    private static IResult Refused(HttpContext context, string code, string message, CashoutOffer fresh)
+    {
+        var e = ErrorEnvelopes.Create(context, StatusCodes.Status409Conflict, code, message);
+        return Results.Json(new { e.Type, e.Title, e.Status, e.Code, e.CorrelationId, e.Detail, e.Instance, freshQuote = fresh }, ContractJson.Options, ErrorEnvelope.MediaType, e.Status);
     }
 
     private static Guid PunterId(HttpContext context) =>
