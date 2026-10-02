@@ -6,6 +6,7 @@
     <Project Path="src/SwiftBets.Cashout.Infrastructure/SwiftBets.Cashout.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/SwiftBets.Cashout.Api.Tests/SwiftBets.Cashout.Api.Tests.csproj" />
     <Project Path="tests/SwiftBets.Cashout.Application.Tests/SwiftBets.Cashout.Application.Tests.csproj" />
     <Project Path="tests/SwiftBets.Cashout.ArchitectureTests/SwiftBets.Cashout.ArchitectureTests.csproj" />
     <Project Path="tests/SwiftBets.Cashout.Domain.Tests/SwiftBets.Cashout.Domain.Tests.csproj" />
