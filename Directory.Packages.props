@@ -13,8 +13,8 @@
     <PackageVersion Include="SwiftBets.BuildingBlocks.Observability" Version="0.7.0" />
     <PackageVersion Include="SwiftBets.BuildingBlocks.Resilience" Version="0.7.0" />
     <PackageVersion Include="SwiftBets.BuildingBlocks.Web" Version="0.7.0" />
-    <PackageVersion Include="SwiftBets.Contracts" Version="2.0.0" />
-    <PackageVersion Include="SwiftBets.Contracts.Grpc" Version="2.0.0" />
+    <PackageVersion Include="SwiftBets.Contracts" Version="2.5.0" />
+    <PackageVersion Include="SwiftBets.Contracts.Grpc" Version="2.5.0" />
     <PackageVersion Include="xunit.v3" Version="4.0.1" />
   </ItemGroup>
 </Project>

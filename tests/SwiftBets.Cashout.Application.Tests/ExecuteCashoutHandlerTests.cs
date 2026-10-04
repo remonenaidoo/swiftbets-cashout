@@ -37,6 +37,16 @@ public sealed class ExecuteCashoutHandlerTests
         settlement.CashoutIds.ShouldBeEmpty();
     }
 
+    [Fact]
+    public async Task A_bet_builder_coupon_is_not_offered_cash_out()
+    {
+        var settlement = new FakeSettlement { MarketId = "bet-builder" };
+        var quotes = new QuoteCashoutHandler(new CashoutPricing(settlement, new FakeOffer()), new QuoteSigner(new byte[32], TimeSpan.FromSeconds(10)),
+            Options.Create(new CashoutOptions { SigningKey = Convert.ToBase64String(new byte[32]) }), TimeProvider.System);
+
+        (await quotes.HandleAsync(Coupon, Punter, CancellationToken.None)).Error!.Code.ShouldBe("bet_builder_not_cashable");
+    }
+
     private static async Task<(CashoutOffer Quote, ExecuteCashoutHandler Execute, FakeSettlement Settlement, FakeOffer Offer)> ArrangeAsync()
     {
         var time = new FakeTimeProvider(new DateTimeOffset(2026, 10, 2, 12, 0, 0, TimeSpan.Zero));
@@ -62,9 +72,11 @@ public sealed class ExecuteCashoutHandlerTests
     {
         public List<Guid> CashoutIds { get; } = [];
 
+        public string MarketId { get; init; } = "fx-1x2";
+
         public Task<CouponForCashout?> GetCouponAsync(Guid couponId, CancellationToken cancellationToken) =>
             Task.FromResult<CouponForCashout?>(new CouponForCashout(couponId, Punter, 1_000, "ZAR", CouponCashoutState.Open, true,
-                [new(Guid.NewGuid(), "fx", "fx-1x2", "home", 3.00m, LegStatus.Open)]));
+                [new(Guid.NewGuid(), "fx", MarketId, "home", 3.00m, LegStatus.Open)]));
 
         public Task<CashOutResult> CashOutAsync(Guid cashoutId, Guid couponId, Guid punterId, long amount, string currency, CancellationToken cancellationToken)
         {
