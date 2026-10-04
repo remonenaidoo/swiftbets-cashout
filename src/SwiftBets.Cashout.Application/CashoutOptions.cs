@@ -21,4 +21,7 @@ public sealed class CashoutOptions
     [Required]
     [MinLength(44)]
     public string SigningKey { get; set; } = string.Empty;
+
+    /// <summary>Keys being rotated out (base64): quotes they signed still verify; nothing new is signed with them.</summary>
+    public List<string> PreviousSigningKeys { get; set; } = [];
 }
