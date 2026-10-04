@@ -25,4 +25,23 @@ public sealed class QuoteSignerTests
         Signer.Verify(forged, Now).Result.ShouldBe(QuoteCheckResult.Invalid);
         Signer.Verify(token, Now.AddSeconds(11)).Result.ShouldBe(QuoteCheckResult.Expired);
     }
+
+    [Fact]
+    public void During_a_key_rotation_quotes_from_the_old_key_still_verify()
+    {
+        var quote = new CashoutQuote(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), 2_280, "ZAR", Now);
+        var rotated = new QuoteSigner(Enumerable.Repeat((byte)7, 32).ToArray(), TimeSpan.FromSeconds(10), [new byte[32]]);
+
+        rotated.Verify(Signer.Sign(quote), Now).Result.ShouldBe(QuoteCheckResult.Valid);
+        Signer.Verify(rotated.Sign(quote), Now).Result.ShouldBe(QuoteCheckResult.Invalid);
+    }
+
+    [Fact]
+    public void Once_the_old_key_is_removed_its_quotes_are_refused()
+    {
+        var quote = new CashoutQuote(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), 2_280, "ZAR", Now);
+        var rotated = new QuoteSigner(Enumerable.Repeat((byte)7, 32).ToArray(), TimeSpan.FromSeconds(10));
+
+        rotated.Verify(Signer.Sign(quote), Now).Result.ShouldBe(QuoteCheckResult.Invalid);
+    }
 }

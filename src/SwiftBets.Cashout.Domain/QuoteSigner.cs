@@ -8,8 +8,11 @@ namespace SwiftBets.Cashout.Domain;
 /// Quotes are stateless: the token carries the quote and an HMAC-SHA256 over it, so execute can trust the amount
 /// without storing anything. Verification is constant-time and rejects a token older than its max age.
 /// </summary>
-public sealed class QuoteSigner(byte[] key, TimeSpan maxAge)
+public sealed class QuoteSigner(byte[] key, TimeSpan maxAge, IReadOnlyList<byte[]>? previousKeys = null)
 {
+    // Signs with the current key only; keys being rotated out still verify until they are removed.
+    private readonly byte[][] _verifyKeys = [key, .. previousKeys ?? []];
+
     public string Sign(CashoutQuote quote)
     {
         ArgumentNullException.ThrowIfNull(quote);
@@ -25,7 +28,7 @@ public sealed class QuoteSigner(byte[] key, TimeSpan maxAge)
             return QuoteCheck.Invalid;
         }
 
-        if (!CryptographicOperations.FixedTimeEquals(HMACSHA256.HashData(key, payloadBytes), signature))
+        if (!_verifyKeys.Any(k => CryptographicOperations.FixedTimeEquals(HMACSHA256.HashData(k, payloadBytes), signature)))
         {
             return QuoteCheck.Invalid;
         }

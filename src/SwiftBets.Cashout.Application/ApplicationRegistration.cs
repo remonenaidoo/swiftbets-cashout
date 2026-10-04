@@ -11,7 +11,8 @@ public static class ApplicationRegistration
         services.AddSingleton(sp =>
         {
             var options = sp.GetRequiredService<IOptions<CashoutOptions>>().Value;
-            return new QuoteSigner(Convert.FromBase64String(options.SigningKey), TimeSpan.FromSeconds(options.QuoteMaxAgeSeconds));
+            return new QuoteSigner(Convert.FromBase64String(options.SigningKey), TimeSpan.FromSeconds(options.QuoteMaxAgeSeconds),
+                options.PreviousSigningKeys.Where(k => k.Length > 0).Select(Convert.FromBase64String).ToList());
         });
         services.AddScoped<CashoutPricing>();
         services.AddScoped<QuoteCashoutHandler>();
