@@ -23,6 +23,12 @@ public sealed class CashoutPricing(ISettlementCashout settlement, IOfferPrices o
             return Error.BusinessRule("coupon_not_cashable", "This coupon cannot be cashed out.");
         }
 
+        // The cashout pricer values independent legs; a bet builder's correlated price is not one it can reproduce.
+        if (coupon.Legs.Any(l => l.MarketId == Contracts.Offer.BetBuilderPricing.MarketId))
+        {
+            return Error.BusinessRule("bet_builder_not_cashable", "Cash out is not available on bet builder bets.");
+        }
+
         var legs = new List<PricedLeg>();
         foreach (var leg in coupon.Legs)
         {
